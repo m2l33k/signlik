@@ -1,0 +1,5 @@
+[
+  {"input":"Hello","output":"(s1) Hello sign"},
+  {"input":"Thank you","output":"(s2) Thank you sign"},
+  {"input":"Yes","output":"(s3) Yes sign"}
+]

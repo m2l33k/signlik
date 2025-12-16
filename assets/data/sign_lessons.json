@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "title": "Basic Greetings",
+    "description": "Learn how to say hello, thank you, and goodbye in sign language."
+  },
+  {
+    "id": 2,
+    "title": "Alphabet Signs",
+    "description": "Learn the hand signs for A-Z letters."
+  },
+  {
+    "id": 3,
+    "title": "Everyday Courtesy",
+    "description": "Please, thank you, sorry and polite gestures."
+  },
+  {
+    "id": 4,
+    "title": "Emergency Signs",
+    "description": "Help, Stop, Danger and more."
+  }
+]
