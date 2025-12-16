@@ -1,7 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import '../models/sign.dart';
-import '../widgets/sign_card.dart'; // We'll reuse parts of it or just build custom UI
 
 class QuizScreen extends StatefulWidget {
   final List<Sign> allSigns;
@@ -20,11 +19,10 @@ class QuizScreen extends StatefulWidget {
 }
 
 class _QuizScreenState extends State<QuizScreen> {
-  List<Question> _questions = [];
+  final List<Question> _questions = [];
   int _currentIndex = 0;
   int _score = 0;
   bool _answered = false;
-  bool _isCorrect = false;
 
   @override
   void initState() {
@@ -62,9 +60,6 @@ class _QuizScreenState extends State<QuizScreen> {
       _answered = true;
       if (selected.id == _questions[_currentIndex].correctSign.id) {
         _score++;
-        _isCorrect = true;
-      } else {
-        _isCorrect = false;
       }
     });
   }
@@ -74,7 +69,6 @@ class _QuizScreenState extends State<QuizScreen> {
       setState(() {
         _currentIndex++;
         _answered = false;
-        _isCorrect = false;
       });
     } else {
       _finishQuiz();
@@ -97,6 +91,19 @@ class _QuizScreenState extends State<QuizScreen> {
           ],
         ),
         actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(ctx); // Close dialog
+              setState(() {
+                _currentIndex = 0;
+                _score = 0;
+                _answered = false;
+                _questions.clear();
+                _generateQuestions();
+              });
+            },
+            child: const Text("Retake"),
+          ),
           TextButton(
             onPressed: () {
               Navigator.pop(ctx); // Close dialog

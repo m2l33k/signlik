@@ -200,13 +200,32 @@ class ApiService {
   }
 
   // ===========================================================================
+  // ML Model Endpoints
+  // ===========================================================================
+
+  Future<Map<String, dynamic>> predictSign(List<double> landmarks) async {
+    final response = await _request(
+      'POST',
+      '/predict',
+      body: {'landmarks': landmarks},
+      usePythonBackend: true,
+      requiresAuth: false,
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Failed to predict sign: ${response.body}');
+    }
+  }
+
+  // ===========================================================================
   // Sign Endpoints
   // ===========================================================================
 
   Future<List<Sign>> getAllSigns({bool includeUnapproved = false}) async {
-    // Note: Checking both Python and Spring backends based on original file logic
-    // Using Python backend as per original implementation for search/list
-    final response = await _request('GET', '/signs?includeUnapproved=$includeUnapproved', usePythonBackend: true);
+    // Using Spring Boot backend
+    final response = await _request('GET', '/signs?includeUnapproved=$includeUnapproved');
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
       return data.map((json) => Sign.fromJson(json)).toList();
@@ -216,7 +235,7 @@ class ApiService {
   }
 
   Future<List<Sign>> searchSigns(String query) async {
-    final response = await _request('GET', '/signs/search?query=$query', usePythonBackend: true);
+    final response = await _request('GET', '/signs/search?query=$query');
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
       return data.map((json) => Sign.fromJson(json)).toList();
@@ -226,7 +245,7 @@ class ApiService {
   }
 
   Future<List<Sign>> getSignsByCategory(String category) async {
-    final response = await _request('GET', '/signs/category/$category', usePythonBackend: true);
+    final response = await _request('GET', '/signs/category/$category');
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
       return data.map((json) => Sign.fromJson(json)).toList();

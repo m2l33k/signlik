@@ -17,7 +17,7 @@ class AppShell extends StatelessWidget {
             decoration: BoxDecoration(
               color: Theme.of(context).cardColor,
               borderRadius: BorderRadius.circular(24),
-              boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 24)],
+              boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 24)],
             ),
             child: Column(
               children: [

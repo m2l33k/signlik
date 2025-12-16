@@ -6,7 +6,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:signlik_frontend/services/api_service.dart';
 import 'package:signlik_frontend/models/chat_message.dart';
 import 'package:signlik_frontend/models/group.dart';
-import 'package:signlik_frontend/models/reaction.dart';
 import 'package:signlik_frontend/screens/group_details_screen.dart';
 
 class GroupChatScreen extends StatefulWidget {
@@ -99,11 +98,13 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
     
     if (image == null) return;
+    if (!mounted) return;
 
     setState(() => _isLoading = true);
 
     try {
       final file = File(image.path);
+      if (!mounted) return;
       final api = Provider.of<ApiService>(context, listen: false);
       
       // 1. Upload file
@@ -213,7 +214,9 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                           final isMe = message.senderEmail == _currentUserEmail;
                           
                           return GestureDetector(
-                            onLongPress: () => _showReactionPicker(message.id),
+                            onLongPress: () {
+                              if (message.id != null) _showReactionPicker(message.id!);
+                            },
                             child: Align(
                               alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
                               child: Container(
@@ -229,7 +232,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                   children: [
                                     if (!isMe) ...[
                                       Text(
-                                        message.senderName ?? message.senderEmail,
+                                        message.senderName,
                                         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                                       ),
                                       const SizedBox(height: 4),

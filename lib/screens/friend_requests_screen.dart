@@ -28,28 +28,34 @@ class _FriendRequestsScreenState extends State<FriendRequestsScreen> {
   Future<void> _acceptRequest(int id) async {
     try {
       await Provider.of<ApiService>(context, listen: false).acceptFriendRequest(id);
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Friend request accepted')),
       );
       _loadRequests();
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to accept request: $e')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to accept request: $e')),
+        );
+      }
     }
   }
 
   Future<void> _rejectRequest(int id) async {
     try {
       await Provider.of<ApiService>(context, listen: false).rejectFriendRequest(id);
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Friend request rejected')),
       );
       _loadRequests();
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to reject request: $e')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to reject request: $e')),
+        );
+      }
     }
   }
 
@@ -87,9 +93,9 @@ class _FriendRequestsScreenState extends State<FriendRequestsScreen> {
                 margin: const EdgeInsets.all(8),
                 child: ListTile(
                   leading: const CircleAvatar(child: Icon(Icons.person)),
-                  title: Text(request.requester.username ?? request.requester.email),
-                  subtitle: Text(request.requester.email),
-                  trailing: Row(
+                  title: Text(request.requester.username),
+                   subtitle: Text(request.requester.email),
+                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(

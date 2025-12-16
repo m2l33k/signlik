@@ -98,9 +98,11 @@ class SignUpScreen extends StatelessWidget {
                         Navigator.pushReplacementNamed(context, '/welcome');
                       }
                     } catch (e) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Signup Failed: $e')),
-                      );
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Signup Failed: $e')),
+                        );
+                      }
                     }
                   },
                   child: const Text("Sign Up"),

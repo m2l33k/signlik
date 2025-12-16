@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import '../services/api_service.dart';
 import '../models/notification_item.dart';
 
@@ -75,7 +75,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                               ),
                             ),
                             title: Text(notification.title, style: TextStyle(fontWeight: notification.isRead ? FontWeight.normal : FontWeight.bold)),
-                            subtitle: colum(notification),
+                            subtitle: _buildNotificationContent(notification),
                             isThreeLine: true,
                           ),
                         );
@@ -84,7 +84,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     );
   }
 
-  Widget colum(NotificationItem n) {
+  Widget _buildNotificationContent(NotificationItem n) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

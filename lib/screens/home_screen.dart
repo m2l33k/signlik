@@ -45,9 +45,9 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Column(
+                  const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
+                    children: [
                       Text(
                         'SignLik',
                         style: TextStyle(
@@ -67,8 +67,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         borderRadius: BorderRadius.circular(12)),
                     child: Row(
                       children: [
-                        Column(
-                          children: const [
+                        const Column(
+                          children: [
                             Text('TSL', style: TextStyle(color: Colors.white)),
                             Text('Language',
                                 style: TextStyle(color: Colors.white70, fontSize: 10))
@@ -122,8 +122,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     ),
                     const SizedBox(height: 16),
-                    Row(
-                      children: const [
+                    const Row(
+                      children: [
                         StatCard(
                             icon: Icons.local_fire_department,
                             label: 'Day Streak',
@@ -190,7 +190,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       Card(
                         margin: const EdgeInsets.symmetric(vertical: 8),
                         child: ListTile(
-                          leading: CircleAvatar(child: Text('${l.id}')),
+                          leading: CircleAvatar(child: Text(l.id.toString())),
                           title: Text(l.title),
                           subtitle: Text(l.description),
                           trailing: ElevatedButton(

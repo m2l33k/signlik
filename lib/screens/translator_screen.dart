@@ -1,73 +1,35 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
+import 'package:provider/provider.dart';
+import '../services/api_service.dart';
 import '../widgets/bottom_nav.dart';
-import '../services/camera_mock.dart';
 import '../services/tts_service.dart';
+import '../services/hand_tracker.dart';
 
 class TranslatorCamera extends StatefulWidget {
-  const TranslatorCamera({super.key});
+  final HandTrackerService handTracker;
+
+  const TranslatorCamera({super.key, required this.handTracker});
 
   @override
   State<TranslatorCamera> createState() => _TranslatorCameraState();
 }
 
 class _TranslatorCameraState extends State<TranslatorCamera> {
-  List<CameraDescription> cameras = [];
-  CameraController? controller;
-  int selectedCameraIndex = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    initCameras();
-  }
-
-  Future<void> initCameras() async {
-    cameras = await availableCameras();
-    if (cameras.isNotEmpty) {
-      controller =
-          CameraController(cameras[selectedCameraIndex], ResolutionPreset.high);
-      await controller!.initialize();
-      if (mounted) setState(() {});
-    }
-  }
-
-  void switchCamera() async {
-    if (cameras.isEmpty) return;
-    selectedCameraIndex = (selectedCameraIndex + 1) % cameras.length;
-    controller =
-        CameraController(cameras[selectedCameraIndex], ResolutionPreset.high);
-    await controller!.initialize();
-    if (mounted) setState(() {});
-  }
-
   @override
   Widget build(BuildContext context) {
-    if (controller == null || !controller!.value.isInitialized) {
+    if (widget.handTracker.cameraController == null || 
+        !widget.handTracker.cameraController!.value.isInitialized) {
       return const Center(child: CircularProgressIndicator());
     }
 
     return Stack(
       children: [
-        CameraPreview(controller!),
-        Positioned(
-          top: 16,
-          right: 16,
-          child: FloatingActionButton(
-            onPressed: switchCamera,
-            mini: true,
-            backgroundColor: Colors.black54,
-            child: const Icon(Icons.cameraswitch, color: Colors.white),
-          ),
-        ),
+        CameraPreview(widget.handTracker.cameraController!),
+        // Add overlay for landmarks if desired
       ],
     );
-  }
-
-  @override
-  void dispose() {
-    controller?.dispose();
-    super.dispose();
   }
 }
 
@@ -81,6 +43,22 @@ class TranslatorScreen extends StatefulWidget {
 class _TranslatorScreenState extends State<TranslatorScreen> {
   bool _detecting = false;
   String _detected = 'Translation will appear here...';
+  late HandTrackerService _handTracker;
+  Timer? _predictionTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _handTracker = HandTrackerService();
+    _handTracker.initialize();
+  }
+
+  @override
+  void dispose() {
+    _predictionTimer?.cancel();
+    _handTracker.dispose();
+    super.dispose();
+  }
 
   void _toggleDetect() {
     setState(() {
@@ -89,21 +67,36 @@ class _TranslatorScreenState extends State<TranslatorScreen> {
     });
 
     if (_detecting) {
-      Future.delayed(const Duration(milliseconds: 900), () async {
-        if (!_detecting) return;
-        final res = CameraMock.simulateDetection();
-        setState(() {
-          _detected = res;
-        });
-        
-        // Log detection
-        try {
-          final api = Provider.of<ApiService>(context, listen: false);
-          await api.saveGestureHistory(res, 0.95); // High confidence for mock
-        } catch (e) {
-          print('Failed to log gesture: $e');
+      // Start prediction loop
+      _predictionTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) async {
+        if (!_detecting) {
+          timer.cancel();
+          return;
+        }
+
+        final landmarks = _handTracker.currentLandmarks;
+        if (landmarks != null && landmarks.length == 42) {
+           try {
+              final api = Provider.of<ApiService>(context, listen: false);
+              final result = await api.predictSign(landmarks);
+              
+              if (mounted) {
+                setState(() {
+                  _detected = "${result['label']} (${(result['confidence'] * 100).toStringAsFixed(1)}%)";
+                });
+                
+                // Save history if confidence is high
+                if (result['confidence'] > 0.85) {
+                   await api.saveGestureHistory(result['label'], result['confidence']);
+                }
+              }
+           } catch (e) {
+             debugPrint("Prediction error: $e");
+           }
         }
       });
+    } else {
+      _predictionTimer?.cancel();
     }
   }
 
@@ -142,8 +135,8 @@ class _TranslatorScreenState extends State<TranslatorScreen> {
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  Column(
+                children: [
+                  const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
@@ -160,7 +153,10 @@ class _TranslatorScreenState extends State<TranslatorScreen> {
                       ),
                     ],
                   ),
-                  Icon(Icons.history, color: Colors.white),
+                  IconButton(
+                    icon: const Icon(Icons.history, color: Colors.white),
+                    onPressed: () {},
+                  ),
                 ],
               ),
             ),
@@ -177,7 +173,17 @@ class _TranslatorScreenState extends State<TranslatorScreen> {
                         borderRadius: BorderRadius.circular(16),
                         child: Stack(
                           children: [
-                            const TranslatorCamera(),
+                            ChangeNotifierProvider.value(
+                              value: _handTracker,
+                              child: Consumer<HandTrackerService>(
+                                builder: (context, tracker, child) {
+                                  if (tracker.error != null) {
+                                    return Center(child: Text(tracker.error!));
+                                  }
+                                  return TranslatorCamera(handTracker: tracker);
+                                },
+                              ),
+                            ),
                             if (_detecting)
                               Container(
                                 decoration: BoxDecoration(

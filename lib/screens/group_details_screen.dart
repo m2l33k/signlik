@@ -36,16 +36,20 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
     try {
       await Provider.of<ApiService>(context, listen: false).addGroupMember(widget.group.id!, email);
       _emailController.clear();
-      Navigator.pop(context); // Close dialog
+      if (mounted) Navigator.pop(context); // Close dialog
       _loadMembers(); // Refresh list
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Member added successfully')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Member added successfully')),
+        );
+      }
     } catch (e) {
-      Navigator.pop(context); // Close dialog
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to add member: $e')),
-      );
+      if (mounted) Navigator.pop(context); // Close dialog
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to add member: $e')),
+        );
+      }
     }
   }
 
@@ -76,13 +80,17 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
     try {
       await Provider.of<ApiService>(context, listen: false).removeGroupMember(widget.group.id!, email);
       _loadMembers();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Member removed successfully')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Member removed successfully')),
+        );
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to remove member: $e')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to remove member: $e')),
+        );
+      }
     }
   }
 
@@ -100,11 +108,11 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
       ),
       body: Column(
         children: [
-          if (widget.group.description != null && widget.group.description!.isNotEmpty)
+          if (widget.group.description.isNotEmpty)
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Text(
-                widget.group.description!,
+                widget.group.description,
                 style: Theme.of(context).textTheme.bodyLarge,
               ),
             ),
@@ -136,7 +144,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                     final member = members[index];
                     return ListTile(
                       leading: const CircleAvatar(child: Icon(Icons.person)),
-                      title: Text(member.username ?? member.email),
+                      title: Text(member.username),
                       subtitle: Text(member.email),
                       trailing: IconButton(
                         icon: const Icon(Icons.remove_circle_outline, color: Colors.red),

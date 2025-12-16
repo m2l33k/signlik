@@ -43,6 +43,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Future<void> _loadCurrentUser() async {
     final email = await Provider.of<ApiService>(context, listen: false).getUserEmail();
+    if (!mounted) return;
     setState(() {
       _currentUserEmail = email;
     });
@@ -52,20 +53,22 @@ class _ChatScreenState extends State<ChatScreen> {
     if (!refresh) setState(() => _isLoading = true);
     
     try {
-      final messages = await Provider.of<ApiService>(context, listen: false)
-          .getConversation(widget.friend.email);
+      final api = Provider.of<ApiService>(context, listen: false);
+      final messages = await api.getConversation(widget.friend.email);
       
+      if (!mounted) return;
+
       setState(() {
         _messages = messages;
         _isLoading = false;
       });
 
       // Mark as read
-      await Provider.of<ApiService>(context, listen: false)
-          .markMessagesAsRead(widget.friend.email);
+      await api.markMessagesAsRead(widget.friend.email);
+      if (!mounted) return;
           
       // Scroll to bottom if not refreshing (or if new message arrived - logic can be improved)
-      if (!refresh) {
+      if (!refresh && mounted) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (_scrollController.hasClients) {
             _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
@@ -87,6 +90,7 @@ class _ChatScreenState extends State<ChatScreen> {
     
     if (image == null) return;
 
+    if (!mounted) return;
     setState(() => _isLoading = true);
 
     try {
@@ -104,6 +108,8 @@ class _ChatScreenState extends State<ChatScreen> {
         type: 'IMAGE'
       );
       
+      if (!mounted) return;
+
       setState(() {
         _messages.add(newMessage);
         _isLoading = false;
@@ -136,6 +142,8 @@ class _ChatScreenState extends State<ChatScreen> {
       final newMessage = await Provider.of<ApiService>(context, listen: false)
           .sendMessage(widget.friend.email, content);
       
+      if (!mounted) return;
+
       setState(() {
         _messages.add(newMessage);
       });
@@ -150,7 +158,9 @@ class _ChatScreenState extends State<ChatScreen> {
         }
       });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+      }
     }
   }
 
@@ -280,5 +290,47 @@ class _ChatScreenState extends State<ChatScreen> {
 
   String _formatTime(DateTime time) {
     return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+  }
+
+  void _showReactionPicker(ChatMessage message) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(16),
+          height: 100,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: ['👍', '❤️', '😂', '😮', '😢', '😡'].map((emoji) {
+              return GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                  _addReaction(message, emoji);
+                },
+                child: Text(
+                  emoji,
+                  style: const TextStyle(fontSize: 30),
+                ),
+              );
+            }).toList(),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _addReaction(ChatMessage message, String reaction) async {
+    if (message.id == null) return;
+    try {
+      await Provider.of<ApiService>(context, listen: false)
+          .addReaction(message.id!, reaction); // Assuming message.id is unique across all messages
+      // Ideally we should refresh the message list or update locally
+      if (!mounted) return;
+      _loadMessages(refresh: true);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to add reaction: $e')));
+      }
+    }
   }
 }

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../services/api_service.dart';
 import '../widgets/bottom_nav.dart';
 import '../models/user.dart';
+import 'settings_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -14,7 +15,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   User? user;
   bool isLoading = true;
   String? error;
-  int _navIndex = 3;
+  final int _navIndex = 3;
 
   @override
   void initState() {
@@ -94,6 +95,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ElevatedButton(
                 onPressed: isSaving ? null : () async {
                   setDialogState(() => isSaving = true);
+                  final messenger = ScaffoldMessenger.of(context);
+                  final navigator = Navigator.of(ctx);
                   try {
                     final api = Provider.of<ApiService>(context, listen: false);
                     final updatedData = {
@@ -107,17 +110,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     await api.updateProfile(user!.email, updatedData);
                     
                     if (mounted) {
-                      Navigator.pop(ctx);
+                      navigator.pop();
                       _fetchProfile(); // Refresh
-                      ScaffoldMessenger.of(context).showSnackBar(
+                      messenger.showSnackBar(
                         const SnackBar(content: Text("Profile updated successfully"))
                       );
                     }
                   } catch (e) {
                     setDialogState(() => isSaving = false);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text("Error updating profile: $e"))
-                    );
+                    if (mounted) {
+                      messenger.showSnackBar(
+                        SnackBar(content: Text("Error updating profile: $e"))
+                      );
+                    }
                   }
                 },
                 child: const Text("Save"),

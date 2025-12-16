@@ -17,10 +17,13 @@ dependencies:
   image_picker: ^1.0.4
   video_player: ^2.7.0
   intl: ^0.20.2
+  google_mlkit_pose_detection: ^0.14.0
+  google_mlkit_commons: ^0.11.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_lints: ^2.0.0
 
 flutter:
   uses-material-design: true

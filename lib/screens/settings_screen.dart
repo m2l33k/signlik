@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../services/api_service.dart';
 import '../models/user_preferences.dart';
@@ -28,8 +30,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
         _isLoading = false;
       });
     } catch (e) {
-      setState(() => _isLoading = false);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+      }
     }
   }
 
@@ -40,7 +44,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     try {
       await Provider.of<ApiService>(context, listen: false).updatePreferences(newPrefs);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to update: $e')));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to update: $e')));
+      }
       // Revert could be implemented here if needed
     }
   }
@@ -50,6 +56,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
     
     if (image == null) return;
+    if (!mounted) return;
 
     setState(() => _isLoading = true);
 
@@ -60,13 +67,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
       // Upload file
       await api.uploadFile(file, folder: 'avatars');
       
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Profile picture updated!')));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Profile picture updated!')));
+      }
       
       // Trigger a profile reload if possible, or assume backend handles it
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to upload: $e')));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to upload: $e')));
+      }
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -80,6 +93,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ? const Center(child: Text('Could not load settings'))
               : ListView(
                   children: [
+                    Center(
+                      child: Stack(
+                        children: [
+                          const CircleAvatar(
+                            radius: 50,
+                            child: Icon(Icons.person, size: 50),
+                          ),
+                          Positioned(
+                            bottom: 0,
+                            right: 0,
+                            child: CircleAvatar(
+                              backgroundColor: Colors.blue,
+                              radius: 18,
+                              child: IconButton(
+                                icon: const Icon(Icons.edit, size: 18, color: Colors.white),
+                                onPressed: _updateProfilePicture,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                     _buildSectionHeader('Account'),
                     ListTile(
                       leading: const Icon(Icons.history),

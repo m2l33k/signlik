@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/sign.dart';
 import '../widgets/sign_card.dart';
+import '../widgets/video_player_widget.dart';
 
 class LessonDetailScreen extends StatefulWidget {
   final String category;
@@ -88,7 +89,7 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
           LinearProgressIndicator(
             value: (_currentIndex + 1) / widget.signs.length,
             backgroundColor: Colors.grey[200],
-            valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+            valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
           ),
           Expanded(
             child: PageView.builder(
@@ -118,9 +119,7 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
                         Expanded(
                           child: SignCard(
                             sign: sign,
-                            onPlay: () {
-                              // Play video logic handled in SignCard
-                            },
+                            onPlay: () => _playSign(sign),
                             onToggleFavorite: () {
                               // Toggle favorite logic
                               setState(() {

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:video_player/video_player.dart';
 import '../services/api_service.dart';
 import '../models/sign.dart';
 import '../widgets/sign_card.dart';
@@ -102,26 +101,17 @@ class _DictionaryScreenState extends State<DictionaryScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(s.name),
+        contentPadding: EdgeInsets.zero,
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              height: 200,
-              width: double.infinity,
-              color: Colors.black,
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.play_circle_outline, color: Colors.white, size: 48),
-                    const SizedBox(height: 8),
-                    const Text('Video Playback Placeholder', style: TextStyle(color: Colors.white)),
-                    const SizedBox(height: 4),
-                    Text(s.videoUrl, style: const TextStyle(color: Colors.white70, fontSize: 10), textAlign: TextAlign.center),
-                  ],
-                ),
-              ),
+            AspectRatio(
+               aspectRatio: 16 / 9,
+               child: VideoPlayerWidget(url: s.videoUrl),
+             ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(s.name, style: const TextStyle(fontWeight: FontWeight.bold)),
             ),
           ],
         ),
@@ -225,7 +215,7 @@ class _DictionaryScreenState extends State<DictionaryScreen> {
                               return SignCard(
                                 sign: s,
                                 isFavorite: favorites.contains(s.id),
-                                onPlay: () {},
+                                onPlay: () => _playSign(s),
                                 onToggleFavorite: () => _toggleFavorite(s),
                               );
                             },

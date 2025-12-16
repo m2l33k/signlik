@@ -66,9 +66,11 @@ class LoginScreen extends StatelessWidget {
                         Navigator.pushReplacementNamed(context, '/welcome');
                       }
                     } catch (e) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Login Failed: $e')),
-                      );
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Login Failed: $e')),
+                        );
+                      }
                     }
                   },
                   child: const Text("Login"),

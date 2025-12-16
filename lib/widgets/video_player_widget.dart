@@ -33,28 +33,36 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
           _controller.setLooping(true);
         }
       }).catchError((e) {
-        if (mounted) setState(() => _error = true);
-        print("Video Error: $e");
+        if (mounted) {
+          setState(() => _error = true);
+        }
+        debugPrint("Video Error: $e");
       });
   }
 
   @override
   void dispose() {
-    if (!_error) _controller.dispose();
+    if (!_error) {
+      _controller.dispose();
+    }
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_error) return const Center(child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(Icons.error, color: Colors.red),
-        Text("Video load error", style: TextStyle(color: Colors.white)),
-      ],
-    ));
+    if (_error) {
+      return const Center(child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.error, color: Colors.red),
+          Text("Video load error", style: TextStyle(color: Colors.white)),
+        ],
+      ));
+    }
     
-    if (!_initialized) return const Center(child: CircularProgressIndicator());
+    if (!_initialized) {
+      return const Center(child: CircularProgressIndicator());
+    }
     
     return AspectRatio(
       aspectRatio: _controller.value.aspectRatio,

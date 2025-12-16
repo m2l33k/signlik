@@ -19,7 +19,7 @@ class _LearningScreenState extends State<LearningScreen> {
   Map<String, List<Sign>> signsByCategory = {};
   bool isLoading = true;
   int tab = 0; // 0 lessons, 1 challenges
-  int _navIndex = 2;
+  final int _navIndex = 2;
 
   @override
   void initState() {
@@ -35,7 +35,7 @@ class _LearningScreenState extends State<LearningScreen> {
       try {
         allSigns = await api.getAllSigns();
       } catch (e) {
-        print('Backend fetch error: $e');
+        debugPrint('Backend fetch error: $e');
         // Fallback handled below if list is empty
       }
       
@@ -93,7 +93,7 @@ class _LearningScreenState extends State<LearningScreen> {
         isLoading = false;
       });
     } catch (e) {
-      print('Error loading lessons: $e');
+      debugPrint('Error loading lessons: $e');
       setState(() {
         isLoading = false;
         // Keep empty or show error

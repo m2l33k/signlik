@@ -41,9 +41,9 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
     }
   }
 
-  Future<void> _unblock(int id) async {
+  Future<void> _unblock(String email) async {
     try {
-      await Provider.of<ApiService>(context, listen: false).unblockUser(id);
+      await Provider.of<ApiService>(context, listen: false).unblockUser(email);
       _loadBlockedUsers();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -88,7 +88,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
                           subtitle: Text('Blocked on: ${blocked.blockedAt.toString().split(' ')[0]}'),
                           trailing: IconButton(
                             icon: const Icon(Icons.lock_open, color: Colors.red),
-                            onPressed: () => _unblock(blocked.id),
+                            onPressed: () => _unblock(blocked.blockedUser.email),
                           ),
                         );
                       },

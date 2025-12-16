@@ -24,7 +24,7 @@ class _ActivityLogScreenState extends State<ActivityLogScreen> {
 
   Future<void> _loadLogs() async {
     try {
-      final logs = await Provider.of<ApiService>(context, listen: false).getActivityLog();
+      final logs = await Provider.of<ApiService>(context, listen: false).getUserActivity();
       if (mounted) {
         setState(() {
           _logs = logs;
