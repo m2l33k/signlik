@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Integration Example - SignLik</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 16px;
+            color: #666;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+        }
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            font-weight: 600;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        iframe {
+            width: 100%;
+            height: 800px;
+            border: none;
+            border-radius: 8px;
+        }
+        .info-box {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2196f3;
+        }
+        .code-block {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Sign Registration Integration Examples</h1>
+        
+        <div class="info-box">
+            <strong>💡 Tip:</strong> This page shows different ways to integrate the Sign Registration feature into your application.
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('standalone')">Standalone</button>
+            <button class="tab" onclick="showTab('iframe')">Iframe Embed</button>
+            <button class="tab" onclick="showTab('module')">Module Integration</button>
+            <button class="tab" onclick="showTab('api')">Direct API</button>
+        </div>
+
+        <!-- Standalone Tab -->
+        <div id="standalone" class="tab-content active">
+            <h2>Standalone Usage</h2>
+            <p>Simply open <code>sign-registration.html</code> in a browser. No integration needed!</p>
+            <iframe src="sign-registration.html"></iframe>
+        </div>
+
+        <!-- Iframe Embed Tab -->
+        <div id="iframe" class="tab-content">
+            <h2>Iframe Embed</h2>
+            <p>Embed the sign registration page in your application using an iframe:</p>
+            <div class="code-block">
+&lt;iframe 
+    src="sign-registration.html" 
+    style="width: 100%; height: 800px; border: none;"
+    title="Sign Registration"
+&gt;&lt;/iframe&gt;
+            </div>
+            <iframe src="sign-registration.html"></iframe>
+        </div>
+
+        <!-- Module Integration Tab -->
+        <div id="module" class="tab-content">
+            <h2>Module Integration</h2>
+            <p>Use the JavaScript functions directly in your application:</p>
+            <div class="code-block">
+// Example: Add sign programmatically
+async function addSignFromYourApp() {
+    const file = document.getElementById('yourFileInput').files[0];
+    const name = document.getElementById('signName').value;
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('name', name);
+    formData.append('description', 'Description here');
+    formData.append('category', 'greetings');
+    formData.append('difficultyLevel', 'beginner');
+    
+    const token = localStorage.getItem('jwt_token');
+    
+    const response = await fetch('http://localhost:8081/api/signs/add', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        },
+        body: formData
+    });
+    
+    const result = await response.json();
+    console.log('Sign added:', result);
+}
+            </div>
+        </div>
+
+        <!-- Direct API Tab -->
+        <div id="api" class="tab-content">
+            <h2>Direct API Usage</h2>
+            <p>Use the REST API directly from your frontend:</p>
+            <div class="code-block">
+// Get all signs
+fetch('http://localhost:8081/api/signs')
+    .then(r => r.json())
+    .then(signs => console.log(signs));
+
+// Search signs
+fetch('http://localhost:8081/api/signs/search?query=hello')
+    .then(r => r.json())
+    .then(signs => console.log(signs));
+
+// Get sign by ID
+fetch('http://localhost:8081/api/signs/1')
+    .then(r => r.json())
+    .then(sign => console.log(sign));
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>
+

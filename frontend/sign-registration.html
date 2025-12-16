@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Registration - SignLik</title>
+    <link rel="stylesheet" href="sign-registration.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📹 Sign Registration</h1>
+            <p class="subtitle">Record and register new sign language signs</p>
+        </header>
+
+        <!-- Login Section (if not logged in) -->
+        <div id="loginSection" class="section">
+            <div class="card">
+                <h2>Login Required</h2>
+                <p>You need to be logged in as a specialist to add signs.</p>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="loginEmail">Email:</label>
+                        <input type="email" id="loginEmail" required placeholder="specialist@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password:</label>
+                        <input type="password" id="loginPassword" required placeholder="Enter your password">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Login</button>
+                </form>
+                <p class="info-text">Don't have an account? <a href="#" id="showRegister">Register as Specialist</a></p>
+            </div>
+        </div>
+
+        <!-- Register Section -->
+        <div id="registerSection" class="section" style="display: none;">
+            <div class="card">
+                <h2>Register as Specialist</h2>
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label for="registerUsername">Username:</label>
+                        <input type="text" id="registerUsername" required placeholder="sign_specialist">
+                    </div>
+                    <div class="form-group">
+                        <label for="registerEmail">Email:</label>
+                        <input type="email" id="registerEmail" required placeholder="specialist@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPassword">Password:</label>
+                        <input type="password" id="registerPassword" required placeholder="Enter password">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Register</button>
+                </form>
+                <p class="info-text">Already have an account? <a href="#" id="showLogin">Login</a></p>
+            </div>
+        </div>
+
+        <!-- Main Sign Registration Section -->
+        <div id="mainSection" class="section" style="display: none;">
+            <!-- Camera Preview -->
+            <div class="card">
+                <h2>📷 Camera Preview</h2>
+                <div class="camera-container">
+                    <video id="videoPreview" autoplay playsinline></video>
+                    <canvas id="canvasPreview" style="display: none;"></canvas>
+                    <div id="recordingIndicator" class="recording-indicator" style="display: none;">
+                        <span class="recording-dot"></span>
+                        <span>Recording...</span>
+                    </div>
+                </div>
+                
+                <div class="camera-controls">
+                    <button id="startCameraBtn" class="btn btn-primary">
+                        <span>📹</span> Start Camera
+                    </button>
+                    <button id="stopCameraBtn" class="btn btn-secondary" disabled>
+                        <span>⏹️</span> Stop Camera
+                    </button>
+                    <button id="startRecordingBtn" class="btn btn-success" disabled>
+                        <span>🔴</span> Start Recording
+                    </button>
+                    <button id="stopRecordingBtn" class="btn btn-danger" disabled>
+                        <span>⏸️</span> Stop Recording
+                    </button>
+                    <button id="capturePhotoBtn" class="btn btn-info" disabled>
+                        <span>📸</span> Capture Photo
+                    </button>
+                </div>
+
+                <div id="previewContainer" class="preview-container" style="display: none;">
+                    <h3>Preview</h3>
+                    <video id="recordedVideo" controls style="display: none;"></video>
+                    <img id="capturedImage" style="display: none; max-width: 100%; border-radius: 8px;">
+                    <div class="preview-actions">
+                        <button id="retakeBtn" class="btn btn-secondary">Retake</button>
+                        <button id="useThisBtn" class="btn btn-primary">Use This</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sign Information Form -->
+            <div class="card">
+                <h2>📝 Sign Information</h2>
+                <form id="signForm">
+                    <div class="form-group">
+                        <label for="signName">Sign Name *</label>
+                        <input type="text" id="signName" required placeholder="e.g., Hello, Thank You, Goodbye">
+                        <small>Enter a unique name for this sign</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="signDescription">Description</label>
+                        <textarea id="signDescription" rows="3" placeholder="Describe the sign, its meaning, or usage context..."></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="signCategory">Category</label>
+                            <select id="signCategory">
+                                <option value="">Select category</option>
+                                <option value="greetings">Greetings</option>
+                                <option value="numbers">Numbers</option>
+                                <option value="actions">Actions</option>
+                                <option value="emotions">Emotions</option>
+                                <option value="questions">Questions</option>
+                                <option value="time">Time & Date</option>
+                                <option value="family">Family</option>
+                                <option value="food">Food & Drink</option>
+                                <option value="colors">Colors</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="signDifficulty">Difficulty Level</label>
+                            <select id="signDifficulty">
+                                <option value="">Select difficulty</option>
+                                <option value="beginner">Beginner</option>
+                                <option value="intermediate">Intermediate</option>
+                                <option value="advanced">Advanced</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="fileInput">Or Upload File</label>
+                        <input type="file" id="fileInput" accept="video/*,image/*">
+                        <small>Supported: MP4, WebM, MOV, AVI, JPEG, PNG, GIF, WebP (Max 100MB)</small>
+                    </div>
+
+                    <button type="submit" id="submitBtn" class="btn btn-primary btn-large" disabled>
+                        <span>✅</span> Register Sign
+                    </button>
+                </form>
+            </div>
+
+            <!-- My Signs Section -->
+            <div class="card">
+                <h2>📚 My Signs</h2>
+                <button id="loadMySignsBtn" class="btn btn-secondary">Load My Signs</button>
+                <div id="mySignsContainer" class="signs-grid"></div>
+            </div>
+
+            <!-- Browse Signs Section -->
+            <div class="card">
+                <h2>🔍 Browse Signs</h2>
+                <div class="search-bar">
+                    <input type="text" id="searchInput" placeholder="Search signs...">
+                    <button id="searchBtn" class="btn btn-primary">Search</button>
+                </div>
+                <div class="filter-bar">
+                    <select id="categoryFilter">
+                        <option value="">All Categories</option>
+                        <option value="greetings">Greetings</option>
+                        <option value="numbers">Numbers</option>
+                        <option value="actions">Actions</option>
+                        <option value="emotions">Emotions</option>
+                        <option value="questions">Questions</option>
+                        <option value="time">Time & Date</option>
+                        <option value="family">Family</option>
+                        <option value="food">Food & Drink</option>
+                        <option value="colors">Colors</option>
+                        <option value="other">Other</option>
+                    </select>
+                    <button id="loadPopularBtn" class="btn btn-secondary">Popular</button>
+                    <button id="loadRecentBtn" class="btn btn-secondary">Recent</button>
+                </div>
+                <div id="signsContainer" class="signs-grid"></div>
+            </div>
+        </div>
+
+        <!-- Status Messages -->
+        <div id="statusMessage" class="status-message"></div>
+    </div>
+
+    <script src="sign-registration.js"></script>
+</body>
+</html>
+
