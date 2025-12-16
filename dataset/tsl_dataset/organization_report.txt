@@ -1,0 +1,74 @@
+TSL Dataset Organization Report
+============================================================
+
+Total images organized: 0
+Unmapped images: 0
+
+Folders needing manual organization:
+  organized (0 images) at ../dataset/tsl_dataset/organized
+
+Images per sign:
+  hello: 0 images
+  goodbye: 0 images
+  thank_you: 0 images
+  please: 0 images
+  sorry: 0 images
+  yes: 0 images
+  no: 0 images
+  maybe: 0 images
+  ok: 0 images
+  help: 0 images
+  mother: 0 images
+  father: 0 images
+  brother: 0 images
+  sister: 0 images
+  family: 0 images
+  water: 0 images
+  food: 0 images
+  eat: 0 images
+  drink: 0 images
+  sleep: 0 images
+  house: 0 images
+  school: 0 images
+  work: 0 images
+  home: 0 images
+  friend: 0 images
+  today: 0 images
+  tomorrow: 0 images
+  yesterday: 0 images
+  morning: 0 images
+  evening: 0 images
+  what: 0 images
+  where: 0 images
+  when: 0 images
+  why: 0 images
+  how: 0 images
+  who: 0 images
+  go: 0 images
+  come: 0 images
+  see: 0 images
+  hear: 0 images
+  speak: 0 images
+  read: 0 images
+  write: 0 images
+  learn: 0 images
+  teach: 0 images
+  understand: 0 images
+  zero: 0 images
+  one: 0 images
+  two: 0 images
+  three: 0 images
+  four: 0 images
+  five: 0 images
+  six: 0 images
+  seven: 0 images
+  eight: 0 images
+  nine: 0 images
+  good: 0 images
+  bad: 0 images
+  happy: 0 images
+  sad: 0 images
+  love: 0 images
+  like: 0 images
+  want: 0 images
+  need: 0 images

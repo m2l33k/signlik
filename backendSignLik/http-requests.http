@@ -1,0 +1,341 @@
+### SignLik Backend API Testing
+### You can run these requests directly in IntelliJ IDEA
+### Base URL: http://localhost:8081
+
+### ============================================
+### AUTHENTICATION ENDPOINTS
+### ============================================
+
+### 1. Register a new user (DEAF)
+POST http://localhost:8081/api/auth/register
+Content-Type: application/json
+
+{
+  "username": "john_doe",
+  "email": "john@example.com",
+  "password": "password123",
+  "role": "DEAF"
+}
+
+### 2. Register another user (HEARING)
+POST http://localhost:8081/api/auth/register
+Content-Type: application/json
+
+{
+  "username": "jane_smith",
+  "email": "jane@example.com",
+  "password": "password123",
+  "role": "HEARING"
+}
+
+### 3. Login with registered user (returns JWT token)
+POST http://localhost:8081/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "john@example.com",
+  "password": "password123"
+}
+
+### 4. Login with wrong password (should fail)
+POST http://localhost:8081/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "john@example.com",
+  "password": "wrongpassword"
+}
+
+### ============================================
+### USER ENDPOINTS
+### ============================================
+
+### 5. Get user profile by email
+GET http://localhost:8081/api/users/profile/john@example.com
+
+### 6. Update user profile
+PUT http://localhost:8081/api/users/profile/john@example.com
+Content-Type: application/json
+
+{
+  "username": "john_updated",
+  "password": "newpassword123"
+}
+
+### 7. Search users by query
+GET http://localhost:8081/api/users/search?query=john
+
+### 8. Get all users
+GET http://localhost:8081/api/users/all
+
+### ============================================
+### MESSAGE ENDPOINTS
+### ============================================
+
+### 9. Send a TEXT message
+POST http://localhost:8081/api/messages/send
+Content-Type: application/json
+
+{
+  "content": "Hello, how are you?",
+  "type": "TEXT",
+  "sender": {
+    "username": "john_doe",
+    "email": "john@example.com",
+    "password": "password123",
+    "role": "DEAF"
+  },
+  "receiver": {
+    "username": "jane_smith",
+    "email": "jane@example.com",
+    "password": "password123",
+    "role": "HEARING"
+  }
+}
+
+### 10. Send a SIGN message
+POST http://localhost:8081/api/messages/send
+Content-Type: application/json
+
+{
+  "content": "👋🤟 (Hello in sign language)",
+  "type": "SIGN",
+  "sender": {
+    "username": "john_doe",
+    "email": "john@example.com",
+    "password": "password123",
+    "role": "DEAF"
+  },
+  "receiver": {
+    "username": "jane_smith",
+    "email": "jane@example.com",
+    "password": "password123",
+    "role": "HEARING"
+  }
+}
+
+### 11. Get all messages
+GET http://localhost:8081/api/messages/all
+
+### 12. Get messages by user email
+GET http://localhost:8081/api/messages/user/john@example.com
+
+### 13. Get conversation between two users
+GET http://localhost:8081/api/messages/conversation?user1=john@example.com&user2=jane@example.com
+
+### 14. Get messages by type (TEXT, VOICE, or SIGN)
+GET http://localhost:8081/api/messages/type/TEXT
+
+### 15. Get message by index
+GET http://localhost:8081/api/messages/0
+
+### 16. Delete message by index
+DELETE http://localhost:8081/api/messages/0
+
+### 16.1. Forward a message to another user
+POST http://localhost:8081/api/messages/forward?originalMessageId=1&fromEmail=john@example.com&toEmail=jane@example.com
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### 17. Get paginated messages (with JWT token)
+GET http://localhost:8081/api/messages/paginated?page=0&size=10
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### ============================================
+### TESTING WITH JWT TOKEN
+### ============================================
+### Note: After login, copy the token from the response and use it in the Authorization header
+### Format: Authorization: Bearer <your-token-here>
+###
+### Example:
+### 1. First login to get token
+### 2. Copy the token from login response
+### 3. Use it in protected endpoints like:
+###    GET http://localhost:8081/api/messages/all
+###    Authorization: Bearer eyJhbGciOiJIUzUxMiJ9...
+
+### ============================================
+### FILE UPLOAD/DOWNLOAD ENDPOINTS
+### ============================================
+
+### 18. Upload a file (requires JWT token)
+POST http://localhost:8081/api/files/upload
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="test.mp3"
+Content-Type: audio/mpeg
+
+< ./test.mp3
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="folder"
+
+voice
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### 19. Get signed URL for file (expiring link)
+GET http://localhost:8081/api/files/url/voice/abc123_test.mp3
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### 20. Download file
+GET http://localhost:8081/api/files/download/voice/abc123_test.mp3
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### 21. Delete file
+DELETE http://localhost:8081/api/files/voice/abc123_test.mp3
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### ============================================
+### MESSAGES WITH ATTACHMENTS & CONVERSION
+### ============================================
+
+### 22. Send VOICE message with attachment (triggers STT conversion)
+POST http://localhost:8081/api/messages/send
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+Content-Type: application/json
+
+{
+  "content": "Voice message",
+  "type": "VOICE",
+  "attachmentUrl": "voice/abc123_audio.mp3",
+  "sender": {
+    "username": "john_doe",
+    "email": "john@example.com",
+    "password": "password123",
+    "role": "DEAF"
+  },
+  "receiver": {
+    "username": "jane_smith",
+    "email": "jane@example.com",
+    "password": "password123",
+    "role": "HEARING"
+  }
+}
+
+### 23. Send SIGN message with video attachment (triggers Sign-to-Text conversion)
+POST http://localhost:8081/api/messages/send
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+Content-Type: application/json
+
+{
+  "content": "Sign language message",
+  "type": "SIGN",
+  "attachmentUrl": "sign/xyz789_video.mp4",
+  "sender": {
+    "username": "john_doe",
+    "email": "john@example.com",
+    "password": "password123",
+    "role": "DEAF"
+  },
+  "receiver": {
+    "username": "jane_smith",
+    "email": "jane@example.com",
+    "password": "password123",
+    "role": "HEARING"
+  }
+}
+
+
+### ============================================
+### NOTIFICATION ENDPOINTS
+### ============================================
+
+### 24. Get all notifications
+GET http://localhost:8081/api/notifications
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### 25. Get unread notifications
+GET http://localhost:8081/api/notifications/unread
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### 26. Get unread notification count
+GET http://localhost:8081/api/notifications/unread-count
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### 27. Mark notification as read
+PUT http://localhost:8081/api/notifications/1/read
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### 28. Mark all notifications as read
+PUT http://localhost:8081/api/notifications/read-all
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### 29. Delete notification
+DELETE http://localhost:8081/api/notifications/1
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### ============================================
+### FRIENDSHIP ENDPOINTS
+### ============================================
+
+### 30. Send friend request
+POST http://localhost:8081/api/friends/request?toEmail=jane@example.com
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### 31. Accept friend request
+PUT http://localhost:8081/api/friends/accept/1
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### 32. Reject friend request
+DELETE http://localhost:8081/api/friends/reject/1
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### 33. Remove friend
+DELETE http://localhost:8081/api/friends/remove?friendEmail=jane@example.com
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### 34. Get all friends
+GET http://localhost:8081/api/friends
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### 35. Get pending friend requests
+GET http://localhost:8081/api/friends/pending
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### ============================================
+### MESSAGE REACTIONS ENDPOINTS
+### ============================================
+
+### 36. Add reaction to message
+POST http://localhost:8081/api/reactions/message/1?reaction=👍
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### 37. Remove reaction from message
+DELETE http://localhost:8081/api/reactions/message/1
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### 38. Get all reactions for a message
+GET http://localhost:8081/api/reactions/message/1
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### ============================================
+### GROUP CONVERSATION ENDPOINTS
+### ============================================
+
+### 39. Create a group
+POST http://localhost:8081/api/groups/create?name=Deaf Community&description=Group for deaf users
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### 40. Add member to group
+POST http://localhost:8081/api/groups/1/members?userEmail=jane@example.com&role=MEMBER
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### 41. Remove member from group
+DELETE http://localhost:8081/api/groups/1/members?userEmail=jane@example.com
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### 42. Get my groups
+GET http://localhost:8081/api/groups/my-groups
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### 43. Get group members
+GET http://localhost:8081/api/groups/1/members
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### ============================================
+### MESSAGE SEARCH
+### ============================================
+
+### 44. Search messages
+GET http://localhost:8081/api/messages/search?query=hello&userEmail=john@example.com
+Authorization: Bearer YOUR_JWT_TOKEN_HERE

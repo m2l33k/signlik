@@ -1,0 +1,40 @@
+services:
+  - type: web
+    name: gesture-ai-backend
+    env: node
+    buildCommand: npm install && npm run build
+    startCommand: npm run start:prod
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DB_HOST
+        fromDatabase:
+          name: gesture-ai-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: gesture-ai-db
+          property: port
+      - key: DB_USERNAME
+        fromDatabase:
+          name: gesture-ai-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: gesture-ai-db
+          property: password
+      - key: DB_NAME
+        fromDatabase:
+          name: gesture-ai-db
+          property: database
+      - key: DB_SSL
+        value: "true"
+      - key: JWT_SECRET
+        generateValue: true
+
+databases:
+  - name: gesture-ai-db
+    databaseName: gesture_ai
+    user: gesture_ai_user

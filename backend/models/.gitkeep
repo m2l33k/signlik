@@ -1,0 +1,5 @@
+# Place trained model files here:
+# - tsl_model.h5 (Keras model)
+# - tsl_gesture_model.tflite (TFLite model)
+# - tsl_model_classes.json (Class labels)
+
